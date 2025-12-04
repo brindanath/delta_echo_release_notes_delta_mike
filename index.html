@@ -34,16 +34,21 @@
 
       const handleDragOver = (e) => {
         e.preventDefault();
+        e.stopPropagation();
         setIsDragging(true);
       };
 
       const handleDragLeave = (e) => {
         e.preventDefault();
+        e.stopPropagation();
+        // Only set to false if we're leaving the main container
+        if (e.currentTarget.contains(e.relatedTarget)) return;
         setIsDragging(false);
       };
 
       const handleDrop = (e) => {
         e.preventDefault();
+        e.stopPropagation();
         setIsDragging(false);
         const file = e.dataTransfer.files[0];
         if (file) {
@@ -53,6 +58,12 @@
           };
           reader.readAsText(file);
         }
+      };
+
+      const handleDragEnter = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setIsDragging(true);
       };
 
       const handleFileSelect = (e) => {
@@ -496,12 +507,15 @@
                   
                   <div 
                     className={"relative rounded-lg transition-all " + (isDragging ? "ring-2 ring-indigo-500 ring-offset-2 ring-offset-gray-900" : "")}
+                    onDragEnter={handleDragEnter}
                     onDragOver={handleDragOver}
                     onDragLeave={handleDragLeave}
                     onDrop={handleDrop}
                   >
                     {isDragging && (
-                      <div className="absolute inset-0 bg-indigo-600/20 border-2 border-dashed border-indigo-500 rounded-lg flex items-center justify-center z-10">
+                      <div 
+                        className="absolute inset-0 bg-indigo-600/20 border-2 border-dashed border-indigo-500 rounded-lg flex items-center justify-center z-10 pointer-events-none"
+                      >
                         <div className="text-center">
                           <span className="text-4xl">📁</span>
                           <p className="text-indigo-300 font-medium mt-2">Drop your config file here</p>
@@ -512,7 +526,7 @@
                       value={pslConfig}
                       onChange={function(e) { setPslConfig(e.target.value); }}
                       placeholder="Paste your PSL configuration here or drag & drop a file..."
-                      className="w-full h-64 p-4 bg-gray-900/50 border border-gray-700 rounded-lg font-mono text-xs text-gray-300 placeholder-gray-600 resize-none focus:outline-none focus:border-indigo-500 transition-all"
+                      className={"w-full h-64 p-4 bg-gray-900/50 border border-gray-700 rounded-lg font-mono text-xs text-gray-300 placeholder-gray-600 resize-none focus:outline-none focus:border-indigo-500 transition-all " + (isDragging ? "pointer-events-none" : "")}
                     />
                   </div>
                   
